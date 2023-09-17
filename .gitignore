@@ -1,0 +1,41 @@
+# 编译输出目录
+**/build
+
+# vscode配置
+**/.vscode
+
+# 日志文件
+**/*.log
+
+# 证书和私钥
+**/*.cer
+**/*.key
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app

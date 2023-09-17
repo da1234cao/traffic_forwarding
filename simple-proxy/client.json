@@ -1,0 +1,12 @@
+{
+    "Type": "client",
+    "LocalListen": {
+        "ListenIp": "0.0.0.0",
+        "ListenPort": 10000
+    },
+    "NextHop": {
+        "skipVerify": true,
+        "ServerIp": "192.168.2.2",
+        "ServerPort": 10001
+    }
+}
