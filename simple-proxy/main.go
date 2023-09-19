@@ -2,7 +2,10 @@ package main
 
 import (
 	"flag"
+	"simple-proxy/client"
 	"simple-proxy/config"
+	"simple-proxy/server"
+	"simple-proxy/utils"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
 	log "github.com/sirupsen/logrus"
@@ -42,5 +45,15 @@ func init() {
 
 func main() {
 	log.Debug("a simple proxy")
+	flag.Parse()
 	config.LoadConfig(confPath)
+	if config.Conf.Type == "client" {
+		client.Start()
+	} else if config.Conf.Type == "server" {
+		// 检查配置中指定的公钥和私钥是否存在。不存在，则自动生成一对到配置中的位置
+		if !utils.PathExists(config.Conf.PrivateKey) || !utils.PathExists(config.Conf.Certificate) {
+			utils.Gencertificate(config.Conf.PrivateKey, config.Conf.Certificate)
+		}
+		server.TLSStart()
+	}
 }

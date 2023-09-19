@@ -14,14 +14,16 @@ type localListen struct {
 
 type nextHop struct {
 	SkipVerify bool   `json:"SkipVerify"`
-	ServerIp   string `json:"ListenIp"`
-	ServerPort int    `json:"ListenPort"`
+	ServerIp   string `json:"ServerIp"`
+	ServerPort int    `json:"ServerPort"`
 }
 
 type configure struct {
 	Type        string      `json:"Type"`
 	LocalListen localListen `json:"LocalListen"`
 	NextHop     nextHop     `json:"NextHop"`
+	PrivateKey  string      `json:"PrivateKey"`
+	Certificate string      `json:"Certificate"`
 }
 
 var Conf configure
