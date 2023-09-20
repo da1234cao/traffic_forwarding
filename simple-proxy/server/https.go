@@ -1,9 +1,9 @@
 package server
 
 import (
-	"bytes"
 	"crypto/tls"
 	"errors"
+	"io"
 	"net"
 	"simple-proxy/config"
 	"strconv"
@@ -12,18 +12,15 @@ import (
 )
 
 func TLSDataHandle(conn net.Conn, sni string) {
-	for {
-		// 构建一个response
-		bodyByte := []byte("hello world")
-		buf := bytes.NewBuffer(nil)
-		buf.WriteString("HTTP/1.1 200 OK\r\n")
-		buf.WriteString("Content-Length: " + strconv.Itoa(len(bodyByte)) + "\r\n")
-		buf.WriteString("\r\n")
-		buf.Write(bodyByte)
-
-		// 发送response
-		buf.WriteTo(conn)
+	// 与sni指向的机器三次握手,目前还不需要tls握手
+	sni_conn, err := net.Dial("tcp", sni)
+	if err != nil {
+		log.Warn("server fail to connect ", sni)
+		conn.Close()
+		return
 	}
+	go io.Copy(conn, sni_conn)
+	go io.Copy(sni_conn, conn)
 }
 
 func TLSStart() error {

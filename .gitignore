@@ -10,6 +10,11 @@
 # 证书和私钥
 **/*.cer
 **/*.key
+**/*.pem
+
+# 当前目录下的配置文件
+client.json
+server.json
 
 # Prerequisites
 *.d
