@@ -8,7 +8,7 @@
 
 ## simple-proxy
 
-代码分别运行在服务端和客户端。通过其进行流量转发，可以顺利访问youtube。
+代码分别运行在服务端和客户端。通过其进行流量转发，可以顺利访问youtube,google等国外网站。
 
 ```shell
 git clone git@github.com:da1234cao/traffic_forwarding.git
@@ -17,13 +17,15 @@ go mod tidy
 ```
 
 客户端使用下面配置。运行`go run . --config=client.json`
-* 类型为客户端
+* 类型为客户端,日志等级为错误
 * 监听本地的10000端口
 * 转发到服务端的10001端口,不验证服务端的证书
+* 允许加密sni。使用EsniKey进行aes加密。EsniKey长度必须为16个字节。
 
 ```json
 {
     "Type": "client",
+    "LogLevel": "error",
     "LocalListen": {
         "ListenIp": "0.0.0.0",
         "ListenPort": 10000
@@ -32,7 +34,9 @@ go mod tidy
         "skipVerify": true,
         "ServerIp": "YOUR SERVER ADDRESS",
         "ServerPort": 10001
-    }
+    },
+    "Esni": true,
+    "EsniKey": "12345678abcdefgh"
 }
 ```
 
@@ -41,16 +45,20 @@ go mod tidy
 * 类型为服务端
 * 监听本地的10001端口
 * 使用的证书和私钥路径。当指定路径的公钥和私钥不存在，自动自签名生成一份。
+* 允许加密sni。使用EsniKey进行aes加密。EsniKey长度必须为16个字节。
 
 ```json
 {
     "Type": "server",
+    "LogLevel": "error",
     "LocalListen": {
         "ListenIp": "0.0.0.0",
         "ListenPort": 10001
     },
     "PrivateKey": "./key.pem",
-    "Certificate": "./cert.pem"
+    "Certificate": "./cert.pem",
+    "Esni": true,
+    "EsniKey": "12345678abcdefgh"
 }
 ```
 
