@@ -47,6 +47,10 @@ func main() {
 	log.Debug("a simple proxy")
 	flag.Parse()
 	config.LoadConfig(confPath)
+	if config.Conf.LogLevel == "error" {
+		log.SetLevel(log.ErrorLevel)
+	}
+
 	if config.Conf.Type == "client" {
 		client.Start()
 	} else if config.Conf.Type == "server" {

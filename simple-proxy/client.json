@@ -1,5 +1,6 @@
 {
     "Type": "client",
+    "LogLevel": "debug",
     "LocalListen": {
         "ListenIp": "0.0.0.0",
         "ListenPort": 10000
@@ -8,5 +9,7 @@
         "skipVerify": true,
         "ServerIp": "192.168.2.2",
         "ServerPort": 10001
-    }
+    },
+    "Esni": true,
+    "EsniKey": "12345678abcdefgh"
 }

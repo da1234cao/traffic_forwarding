@@ -2,6 +2,7 @@ package client
 
 import (
 	"bufio"
+	"encoding/base64"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -214,7 +215,16 @@ func readRequest(proxy *proxy.Proxy) error {
 	port := binary.BigEndian.Uint16(buf[:2])
 	proxy.Request.Atyp = atyp
 	proxy.Request.Addr = fmt.Sprintf("%s:%d", addr, port)
-	log.Debug("request is", proxy.Request)
+	log.Debug("request is:", proxy.Request.Addr)
+	return nil
+}
+
+func errReplay(proxy *proxy.Proxy) error {
+	log.Warn("fail to connect server: ", config.Conf.NextHop.ServerIp+":"+strconv.Itoa(config.Conf.NextHop.ServerPort))
+	_, rerr := proxy.Inbound.Conn.Write([]byte{SOCKS5VERSION, HostUnreachable, 0x00, 0x01, 0, 0, 0, 0, 0, 0})
+	if rerr != nil {
+		return errors.New("fail in replay " + rerr.Error())
+	}
 	return nil
 }
 
@@ -228,14 +238,22 @@ func replay(proxy *proxy.Proxy) error {
 		   +----+-----+-------+------+----------+----------+
 	*/
 
-	// 与服务端建立连接
-	conn, err := NewTlsConn(proxy.Request.Addr)
-	if err != nil {
-		log.Warn("fail to connect server: ", config.Conf.NextHop.ServerIp+":"+strconv.Itoa(config.Conf.NextHop.ServerPort))
-		_, rerr := proxy.Inbound.Conn.Write([]byte{SOCKS5VERSION, HostUnreachable, 0x00, 0x01, 0, 0, 0, 0, 0, 0})
-		if rerr != nil {
-			return errors.New("fail in replay " + err.Error())
+	// 对称加密sni,然后base64编码
+	enc_sni := proxy.Request.Addr
+	var err error
+	if config.Conf.Esni && len(config.Conf.EsniKey) == 16 {
+		enc_sni, err = utils.AesEncryptStr(proxy.Request.Addr, config.Conf.EsniKey)
+		if err != nil {
+			errReplay(proxy)
+			return errors.New("fail in encrypt sni " + proxy.Request.Addr + err.Error())
 		}
+		enc_sni = base64.StdEncoding.EncodeToString([]byte(enc_sni))
+	}
+
+	// 与服务端建立连接
+	conn, err := NewTlsConn(string(enc_sni))
+	if err != nil {
+		errReplay(proxy)
 		return errors.New("fail in connect addr " + proxy.Request.Addr + err.Error())
 	}
 	_, err = proxy.Inbound.Conn.Write([]byte{SOCKS5VERSION, Succeeded, 0x00, 0x01, 0, 0, 0, 0, 0, 0})

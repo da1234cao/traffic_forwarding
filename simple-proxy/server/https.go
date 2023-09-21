@@ -2,10 +2,12 @@ package server
 
 import (
 	"crypto/tls"
+	"encoding/base64"
 	"errors"
 	"io"
 	"net"
 	"simple-proxy/config"
+	"simple-proxy/utils"
 	"strconv"
 
 	log "github.com/sirupsen/logrus"
@@ -52,7 +54,24 @@ func TLSStart() error {
 		}
 
 		sni := tlsConn.ConnectionState().ServerName
-		// log.Debug("sni:", sni)
-		go TLSDataHandle(conn, sni)
+
+		// 解密sni
+		dec_sni := sni
+		if config.Conf.Esni && len(config.Conf.EsniKey) == 16 {
+			var err error
+			dec_sni_byte, err := base64.StdEncoding.DecodeString(sni)
+			if err != nil {
+				log.Warn("fail in base decode sni " + dec_sni + err.Error())
+				continue
+			}
+			dec_sni, err = utils.AesDecryptStr(string(dec_sni_byte), config.Conf.EsniKey)
+			if err != nil {
+				log.Warn("fail in aes dencrypt sni " + sni + err.Error())
+				continue
+			}
+		}
+		log.Debug("rev sni:" + dec_sni)
+
+		go TLSDataHandle(conn, dec_sni)
 	}
 }

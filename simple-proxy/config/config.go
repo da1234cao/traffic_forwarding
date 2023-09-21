@@ -20,10 +20,13 @@ type nextHop struct {
 
 type configure struct {
 	Type        string      `json:"Type"`
+	LogLevel    string      `json:"LogLevel"`
 	LocalListen localListen `json:"LocalListen"`
 	NextHop     nextHop     `json:"NextHop"`
 	PrivateKey  string      `json:"PrivateKey"`
 	Certificate string      `json:"Certificate"`
+	Esni        bool        `json:"Esni"`
+	EsniKey     string      `json:"EsniKey"`
 }
 
 var Conf configure
