@@ -66,9 +66,24 @@ go mod tidy
 
 1. 浏览器安装SwitchyOmega插件，使用sock5代理协议。将要访问的地址，发送给客户端。
 2. 客户端和服务端进行tls握手。浏览器要访问的地址，通过sni，从客户端传递到服务端。
-3. 服务端与浏览器要访问的目标地址，三次握手建立连接。(服务器不需要和目标地址三次握手。三次握手是浏览器和目标地址之间的事情。tls在tcp之上。tcp代理不要过上层事情)
+3. 服务端与浏览器要访问的目标地址，三次握手建立连接。(服务器不需要和目标地址进行tls握手。tls握手是浏览器和目标地址之间的事情。tls在tcp之上。tcp代理不要过上层事情)
 4. 上面打通tcp链路后，即可进行数据传输。浏览器<-->客户端<-->服务端<-->目标地址。
+
+# 文档
+
+我看过C++实现的正向代理。所以，很容易使用go实现一个正向代理。写这个项目的时候，我go也是从头学的。按照下面顺序，我们可以一步步使用go实现一个正向代理。
+
+1. [go入门实践一-go语言的hello-world入门](https://blog.csdn.net/sinat_38816924/article/details/131901629)
+2. [go入门实践二-tcp服务端](https://da1234cao.blog.csdn.net/article/details/132115292)
+3. [go入门实践三-go日志库-Logrus入门教程](https://da1234cao.blog.csdn.net/article/details/132198049)
+4. [go入门实践四-go实现一个简单的tcp-socks5代理服务](https://da1234cao.blog.csdn.net/article/details/132262289)
 
 # 参考
 
 [Subsocks: 用 Go 实现一个 Socks5 安全代理](https://luyuhuang.tech/2020/12/02/subsocks.html)
+
+# 最后
+
+这个项目的其他部分暂时不写了。
+* vpn功能实现可参考clash和gosh，内部调用wireguard提供vpn功能。
+* UI界面显示实时流量情况。需要实现一个功能，其可以跨平台的监听某一个端口的流量情况。
